@@ -42,10 +42,17 @@
             const yRow = document.querySelector('tbody tr');
             yRow.innerHTML = '<th>y</th>'; // Reset the row content
 
+            const usedValues = new Set();
             let prevValue = Math.random() * 10; // Initialize the first value
+
             for (let i = 0; i < 10; i++) {
-                const randomValue = Math.min(Math.max(prevValue + (Math.random() * 4 - 2), 0), 10).toFixed(1); // Ensure difference <= 2 and within 0-10
+                let randomValue;
+                do {
+                    randomValue = Math.min(Math.max(prevValue + (Math.random() * 4 - 2), 0), 10).toFixed(1); // Ensure difference <= 2 and within 0-10
+                } while (usedValues.has(randomValue));
+
                 prevValue = parseFloat(randomValue); // Update the previous value
+                usedValues.add(randomValue); // Add to the set of used values
 
                 const cell = document.createElement('td');
                 cell.textContent = randomValue;
@@ -115,6 +122,36 @@
             });
         }
 
+        function updateCostTable(step, cost) {
+            const tableBody = document.getElementById('cost-table-body');
+            const row = document.createElement('tr');
+
+            const stepCell = document.createElement('td');
+            stepCell.textContent = step;
+
+            const costCell = document.createElement('td');
+            costCell.textContent = cost;
+
+            row.appendChild(stepCell);
+            row.appendChild(costCell);
+            tableBody.appendChild(row);
+        }
+
+        async function playTone(frequencies, duration) {
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+
+            frequencies.forEach(frequency => {
+                const oscillator = audioContext.createOscillator();
+                oscillator.type = 'sine';
+                oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime);
+                oscillator.connect(audioContext.destination);
+                oscillator.start();
+                setTimeout(() => oscillator.stop(), duration);
+            });
+
+            await new Promise(resolve => setTimeout(resolve, duration));
+        }
+
         async function plotRegressionLineStepByStep() {
             const canvas = document.getElementById('graph');
             const ctx = canvas.getContext('2d');
@@ -159,8 +196,17 @@
                 ctx.stroke();
 
                 costElement.textContent = `Coût actuel : ${cost}`;
+                updateCostTable(i, cost);
 
-                await new Promise(resolve => setTimeout(resolve, 200));
+                const baseFrequency = 440; // La
+                const frequencies = [
+                    baseFrequency * cost, // La
+                    baseFrequency * 1.25 * cost, // Tierce majeure (environ 554 Hz sans coût)
+                    baseFrequency * 1.5 * cost // Quinte juste (environ 660 Hz sans coût)
+                ];
+
+                await playTone(frequencies, 200); // Play accord
+                await new Promise(resolve => setTimeout(resolve, 100));
             }
         }
 
@@ -203,5 +249,15 @@
     <button id="run-regression">Lancer la régression</button>
     <canvas id="graph" width="400" height="300"></canvas>
     <p id="cost">Coût actuel : </p>
+    <table>
+        <thead>
+            <tr>
+                <th>Étape</th>
+                <th>Coût</th>
+            </tr>
+        </thead>
+        <tbody id="cost-table-body">
+        </tbody>
+    </table>
 </body>
 </html>
