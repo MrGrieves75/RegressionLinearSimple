@@ -122,21 +122,6 @@
             });
         }
 
-        function updateCostTable(step, cost) {
-            const tableBody = document.getElementById('cost-table-body');
-            const row = document.createElement('tr');
-
-            const stepCell = document.createElement('td');
-            stepCell.textContent = step;
-
-            const costCell = document.createElement('td');
-            costCell.textContent = cost;
-
-            row.appendChild(stepCell);
-            row.appendChild(costCell);
-            tableBody.appendChild(row);
-        }
-
         async function playTone(frequencies, duration) {
             const audioContext = new (window.AudioContext || window.webkitAudioContext)();
 
@@ -196,7 +181,6 @@
                 ctx.stroke();
 
                 costElement.textContent = `Coût actuel : ${cost}`;
-                updateCostTable(i, cost);
 
                 const baseFrequency = 440; // La
                 const frequencies = [
@@ -249,15 +233,5 @@
     <button id="run-regression">Lancer la régression</button>
     <canvas id="graph" width="400" height="300"></canvas>
     <p id="cost">Coût actuel : </p>
-    <table>
-        <thead>
-            <tr>
-                <th>Étape</th>
-                <th>Coût</th>
-            </tr>
-        </thead>
-        <tbody id="cost-table-body">
-        </tbody>
-    </table>
 </body>
 </html>
