@@ -41,8 +41,12 @@
         function fillRandomValues() {
             const yRow = document.querySelector('tbody tr');
             yRow.innerHTML = '<th>y</th>'; // Reset the row content
+
+            let prevValue = Math.random() * 10; // Initialize the first value
             for (let i = 0; i < 10; i++) {
-                const randomValue = (Math.random() * 10).toFixed(1); // Random value between 0 and 10 with 1 decimal
+                const randomValue = Math.min(Math.max(prevValue + (Math.random() * 4 - 2), 0), 10).toFixed(1); // Ensure difference <= 2 and within 0-10
+                prevValue = parseFloat(randomValue); // Update the previous value
+
                 const cell = document.createElement('td');
                 cell.textContent = randomValue;
                 yRow.appendChild(cell);
