@@ -122,21 +122,6 @@
             });
         }
 
-        async function playTone(frequencies, duration) {
-            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-
-            frequencies.forEach(frequency => {
-                const oscillator = audioContext.createOscillator();
-                oscillator.type = 'sine';
-                oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime);
-                oscillator.connect(audioContext.destination);
-                oscillator.start();
-                setTimeout(() => oscillator.stop(), duration);
-            });
-
-            await new Promise(resolve => setTimeout(resolve, duration));
-        }
-
         async function plotRegressionLineStepByStep() {
             const canvas = document.getElementById('graph');
             const ctx = canvas.getContext('2d');
@@ -182,15 +167,7 @@
 
                 costElement.textContent = `Coût actuel : ${cost}`;
 
-                const baseFrequency = 440; // La
-                const frequencies = [
-                    baseFrequency * cost, // La
-                    baseFrequency * 1.25 * cost, // Tierce majeure (environ 554 Hz sans coût)
-                    baseFrequency * 1.5 * cost // Quinte juste (environ 660 Hz sans coût)
-                ];
-
-                await playTone(frequencies, 200); // Play accord
-                await new Promise(resolve => setTimeout(resolve, 100));
+                await new Promise(resolve => setTimeout(resolve, 200));
             }
         }
 
